@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modern Expense Tracker</title>
+    <title>Voice Expense Tracker</title>
     <style>
         * {
             margin: 0;
@@ -12,350 +12,227 @@
         }
 
         body {
-            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: 0;
-            overflow-x: hidden;
+            padding: 20px;
         }
 
         .container {
-            max-width: 100%;
-            margin: 0;
-            background: #ffffff;
-            min-height: 100vh;
-            position: relative;
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
         }
 
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 60px 24px 40px;
+            padding: 30px 20px;
             text-align: center;
-            border-radius: 0 0 32px 32px;
-            margin-bottom: 24px;
-            box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
         }
 
         .header h1 {
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 12px;
-            letter-spacing: -0.5px;
+            font-size: 24px;
+            margin-bottom: 10px;
         }
 
         .balance {
-            font-size: 48px;
-            font-weight: 800;
-            margin: 16px 0 8px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .balance-label {
-            font-size: 16px;
-            opacity: 0.9;
-            font-weight: 500;
+            font-size: 32px;
+            font-weight: bold;
+            margin-top: 10px;
         }
 
         .input-section {
-            padding: 0 24px 24px;
-        }
-
-        .voice-card {
-            background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
-            border-radius: 20px;
-            padding: 24px;
-            margin-bottom: 24px;
-            box-shadow: 0 8px 32px rgba(255, 107, 107, 0.25);
+            padding: 20px;
+            border-bottom: 1px solid #eee;
         }
 
         .voice-input {
             display: flex;
-            align-items: center;
-            gap: 16px;
+            gap: 10px;
+            margin-bottom: 15px;
         }
 
         .voice-btn {
-            background: rgba(255, 255, 255, 0.2);
+            background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
             color: white;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            padding: 16px;
+            border: none;
+            padding: 15px;
             border-radius: 50%;
             cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
             transition: all 0.3s ease;
             flex-shrink: 0;
-            width: 64px;
-            height: 64px;
+            width: 60px;
+            height: 60px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
-            backdrop-filter: blur(10px);
         }
 
-        .voice-btn:hover, .voice-btn.listening {
-            background: rgba(255, 255, 255, 0.3);
-            transform: scale(1.05);
-            box-shadow: 0 8px 24px rgba(255, 255, 255, 0.2);
+        .voice-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
         }
 
         .voice-btn.listening {
-            animation: pulse 2s infinite;
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
+            animation: pulse 1.5s infinite;
         }
 
         @keyframes pulse {
-            0%, 100% { transform: scale(1.05); }
-            50% { transform: scale(1.15); }
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
         }
 
         .voice-feedback {
             flex: 1;
-            color: white;
-            font-size: 16px;
-            font-weight: 500;
-            line-height: 1.5;
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 15px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            font-style: italic;
+            color: #6c757d;
         }
 
-        .manual-card {
-            background: white;
-            border-radius: 20px;
-            padding: 24px;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.06);
-            border: 1px solid rgba(0,0,0,0.04);
+        .manual-inputs {
+            display: grid;
+            gap: 10px;
+            margin-top: 15px;
         }
 
-        .input-group {
-            margin-bottom: 20px;
-        }
-
-        .input-label {
-            font-size: 14px;
-            font-weight: 600;
-            color: #374151;
-            margin-bottom: 8px;
-            display: block;
+        .input-row {
+            display: flex;
+            gap: 10px;
         }
 
         input, select {
-            width: 100%;
-            padding: 16px 20px;
-            border: 2px solid #e5e7eb;
-            border-radius: 12px;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
             font-size: 16px;
-            font-weight: 500;
-            background: #fafafa;
-            transition: all 0.3s ease;
-            appearance: none;
+            transition: border-color 0.3s ease;
         }
 
         input:focus, select:focus {
             outline: none;
             border-color: #667eea;
-            background: white;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .input-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-
-        .category-select {
-            background: #fafafa;
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
-            background-position: right 12px center;
-            background-repeat: no-repeat;
-            background-size: 16px;
-            padding-right: 40px;
         }
 
         .add-btn {
-            background: linear-gradient(135deg, #10b981, #059669);
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
             color: white;
             border: none;
-            padding: 18px 24px;
-            border-radius: 16px;
+            padding: 15px;
+            border-radius: 12px;
             cursor: pointer;
             font-size: 16px;
-            font-weight: 700;
-            margin-top: 20px;
-            width: 100%;
+            font-weight: 600;
+            margin-top: 15px;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
         }
 
         .add-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);
-        }
-
-        .stats-section {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-            padding: 0 24px 24px;
-        }
-
-        .stat-card {
-            background: white;
-            padding: 20px;
-            border-radius: 16px;
-            text-align: center;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
-            border: 1px solid rgba(0,0,0,0.04);
-        }
-
-        .stat-value {
-            font-size: 24px;
-            font-weight: 800;
-            color: #1f2937;
-            margin-bottom: 4px;
-        }
-
-        .stat-label {
-            font-size: 12px;
-            color: #6b7280;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .expenses-section {
-            padding: 0 24px 100px;
-        }
-
-        .section-title {
-            font-size: 20px;
-            font-weight: 700;
-            color: #1f2937;
-            margin-bottom: 16px;
-            padding-left: 4px;
+            box-shadow: 0 4px 15px rgba(78, 205, 196, 0.3);
         }
 
         .expenses-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
+            max-height: 400px;
+            overflow-y: auto;
         }
 
         .expense-item {
-            background: white;
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
-            border: 1px solid rgba(0,0,0,0.04);
-            transition: all 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background-color 0.3s ease;
         }
 
         .expense-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+            background-color: #f8f9fa;
         }
 
-        .expense-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 8px;
+        .expense-details {
+            flex: 1;
         }
 
         .expense-description {
-            font-weight: 700;
-            color: #1f2937;
-            font-size: 16px;
+            font-weight: 600;
+            color: #333;
             margin-bottom: 4px;
         }
 
-        .expense-amount {
-            font-weight: 800;
-            color: #dc2626;
-            font-size: 20px;
-        }
-
-        .expense-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
         .expense-category {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 14px;
-            color: #6b7280;
-            background: #f3f4f6;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-weight: 600;
+            font-size: 12px;
+            color: #666;
+            background: #e9ecef;
+            padding: 2px 8px;
+            border-radius: 12px;
+            display: inline-block;
         }
 
-        .expense-date {
-            font-size: 12px;
-            color: #9ca3af;
-            font-weight: 500;
+        .expense-amount {
+            font-weight: bold;
+            color: #ff6b6b;
+            font-size: 18px;
         }
 
         .delete-btn {
-            background: #fef2f2;
-            border: 1px solid #fecaca;
-            color: #dc2626;
-            padding: 8px;
-            border-radius: 8px;
+            background: none;
+            border: none;
+            color: #dc3545;
             cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 16px;
-            width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            padding: 5px;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
         }
 
         .delete-btn:hover {
-            background: #fee2e2;
-            border-color: #fca5a5;
+            background-color: #f8d7da;
         }
 
         .empty-state {
             text-align: center;
-            padding: 60px 20px;
-            color: #6b7280;
+            padding: 40px 20px;
+            color: #6c757d;
         }
 
-        .empty-icon {
-            font-size: 48px;
-            margin-bottom: 16px;
-            opacity: 0.5;
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            padding: 20px;
+            background: #f8f9fa;
         }
 
-        .empty-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #374151;
+        .stat-card {
+            text-align: center;
+            padding: 15px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
 
-        .empty-subtitle {
-            font-size: 14px;
-            line-height: 1.5;
+        .stat-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
         }
 
-        /* Responsive adjustments */
-        @media (max-width: 480px) {
-            .header {
-                padding: 50px 20px 32px;
-            }
-            
-            .balance {
-                font-size: 40px;
-            }
-            
-            .input-section, .stats-section, .expenses-section {
-                padding-left: 20px;
-                padding-right: 20px;
-            }
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
         }
     </style>
 </head>
@@ -364,51 +241,38 @@
         <div class="header">
             <h1>💰 Expense Tracker</h1>
             <div class="balance" id="totalBalance">₹0.00</div>
-            <div class="balance-label">Total Expenses</div>
+            <div style="font-size: 14px; opacity: 0.9;">Total Expenses</div>
         </div>
 
         <div class="input-section">
-            <div class="voice-card">
-                <div class="voice-input">
-                    <button class="voice-btn" id="voiceBtn" title="Tap to speak">
-                        🎤
-                    </button>
-                    <div class="voice-feedback" id="voiceFeedback">
-                        Tap the microphone to add expense by voice
-                    </div>
+            <div class="voice-input">
+                <button class="voice-btn" id="voiceBtn" title="Click to speak">
+                    🎤
+                </button>
+                <div class="voice-feedback" id="voiceFeedback">
+                    Tap the microphone to add expense by voice
                 </div>
             </div>
 
-            <div class="manual-card">
-                <div class="input-group">
-                    <label class="input-label">Description</label>
-                    <input type="text" id="description" placeholder="What did you buy?" maxlength="50">
-                </div>
-                
+            <div class="manual-inputs">
+                <input type="text" id="description" placeholder="What did you buy?" maxlength="50">
                 <div class="input-row">
-                    <div class="input-group">
-                        <label class="input-label">Amount</label>
-                        <input type="number" id="amount" placeholder="Amount (₹)" step="0.01">
-                    </div>
-                    <div class="input-group">
-                        <label class="input-label">Category</label>
-                        <select id="category" class="category-select">
-                            <option value="food">🍔 Food</option>
-                            <option value="transport">🚗 Transport</option>
-                            <option value="shopping">🛍️ Shopping</option>
-                            <option value="entertainment">🎬 Entertainment</option>
-                            <option value="bills">💡 Bills</option>
-                            <option value="health">🏥 Health</option>
-                            <option value="other">📋 Other</option>
-                        </select>
-                    </div>
+                    <input type="number" id="amount" placeholder="Amount (₹)" step="0.01" style="flex: 1">
+                    <select id="category" style="flex: 1">
+                        <option value="food">🍔 Food</option>
+                        <option value="transport">🚗 Transport</option>
+                        <option value="shopping">🛍️ Shopping</option>
+                        <option value="entertainment">🎬 Entertainment</option>
+                        <option value="bills">💡 Bills</option>
+                        <option value="health">🏥 Health</option>
+                        <option value="other">📋 Other</option>
+                    </select>
                 </div>
-                
                 <button class="add-btn" id="addBtn">Add Expense</button>
             </div>
         </div>
 
-        <div class="stats-section">
+        <div class="stats">
             <div class="stat-card">
                 <div class="stat-value" id="expenseCount">0</div>
                 <div class="stat-label">Total Entries</div>
@@ -419,14 +283,10 @@
             </div>
         </div>
 
-        <div class="expenses-section">
-            <h2 class="section-title">Recent Expenses</h2>
-            <div class="expenses-list" id="expensesList">
-                <div class="empty-state">
-                    <div class="empty-icon">📊</div>
-                    <div class="empty-title">No expenses yet</div>
-                    <div class="empty-subtitle">Start tracking by adding your first expense above</div>
-                </div>
+        <div class="expenses-list" id="expensesList">
+            <div class="empty-state">
+                No expenses recorded yet.<br>
+                Start by adding your first expense!
             </div>
         </div>
     </div>
@@ -627,9 +487,8 @@
                 if (this.expenses.length === 0) {
                     this.expensesList.innerHTML = `
                         <div class="empty-state">
-                            <div class="empty-icon">📊</div>
-                            <div class="empty-title">No expenses yet</div>
-                            <div class="empty-subtitle">Start tracking by adding your first expense above</div>
+                            No expenses recorded yet.<br>
+                            Start by adding your first expense!
                         </div>
                     `;
                     return;
@@ -637,22 +496,14 @@
 
                 this.expensesList.innerHTML = this.expenses.map(expense => `
                     <div class="expense-item">
-                        <div class="expense-header">
-                            <div>
-                                <div class="expense-description">${expense.description}</div>
-                                <div class="expense-footer">
-                                    <div class="expense-category">
-                                        ${this.getCategoryIcon(expense.category)} ${expense.category}
-                                    </div>
-                                    <div class="expense-date">${expense.date}</div>
-                                </div>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 12px;">
-                                <div class="expense-amount">₹${expense.amount.toFixed(2)}</div>
-                                <button class="delete-btn" onclick="app.deleteExpense(${expense.id})" title="Delete">
-                                    🗑️
-                                </button>
-                            </div>
+                        <div class="expense-details">
+                            <div class="expense-description">${expense.description}</div>
+                            <span class="expense-category">${this.getCategoryIcon(expense.category)} ${expense.category}</span>
+                            <span style="margin-left: 10px; font-size: 12px; color: #999;">${expense.date}</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div class="expense-amount">₹${expense.amount.toFixed(2)}</div>
+                            <button class="delete-btn" onclick="app.deleteExpense(${expense.id})" title="Delete">🗑️</button>
                         </div>
                     </div>
                 `).join('');
