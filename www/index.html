@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Expense Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .balance {
+            font-size: 32px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .input-section {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .voice-input {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .voice-btn {
+            background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .voice-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+        }
+
+        .voice-btn.listening {
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .voice-feedback {
+            flex: 1;
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 15px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            font-style: italic;
+            color: #6c757d;
+        }
+
+        .manual-inputs {
+            display: grid;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        input, select {
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .add-btn {
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .add-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(78, 205, 196, 0.3);
+        }
+
+        .expenses-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .expense-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background-color 0.3s ease;
+        }
+
+        .expense-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .expense-details {
+            flex: 1;
+        }
+
+        .expense-description {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .expense-category {
+            font-size: 12px;
+            color: #666;
+            background: #e9ecef;
+            padding: 2px 8px;
+            border-radius: 12px;
+            display: inline-block;
+        }
+
+        .expense-amount {
+            font-weight: bold;
+            color: #ff6b6b;
+            font-size: 18px;
+        }
+
+        .delete-btn {
+            background: none;
+            border: none;
+            color: #dc3545;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        .delete-btn:hover {
+            background-color: #f8d7da;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6c757d;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 15px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💰 Expense Tracker</h1>
+            <div class="balance" id="totalBalance">₹0.00</div>
+            <div style="font-size: 14px; opacity: 0.9;">Total Expenses</div>
+        </div>
+
+        <div class="input-section">
+            <div class="voice-input">
+                <button class="voice-btn" id="voiceBtn" title="Click to speak">
+                    🎤
+                </button>
+                <div class="voice-feedback" id="voiceFeedback">
+                    Tap the microphone to add expense by voice
+                </div>
+            </div>
+
+            <div class="manual-inputs">
+                <input type="text" id="description" placeholder="What did you buy?" maxlength="50">
+                <div class="input-row">
+                    <input type="number" id="amount" placeholder="Amount (₹)" step="0.01" style="flex: 1">
+                    <select id="category" style="flex: 1">
+                        <option value="food">🍔 Food</option>
+                        <option value="transport">🚗 Transport</option>
+                        <option value="shopping">🛍️ Shopping</option>
+                        <option value="entertainment">🎬 Entertainment</option>
+                        <option value="bills">💡 Bills</option>
+                        <option value="health">🏥 Health</option>
+                        <option value="other">📋 Other</option>
+                    </select>
+                </div>
+                <button class="add-btn" id="addBtn">Add Expense</button>
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-value" id="expenseCount">0</div>
+                <div class="stat-label">Total Entries</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="avgExpense">₹0</div>
+                <div class="stat-label">Average</div>
+            </div>
+        </div>
+
+        <div class="expenses-list" id="expensesList">
+            <div class="empty-state">
+                No expenses recorded yet.<br>
+                Start by adding your first expense!
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Wait for Cordova to load
+        document.addEventListener('deviceready', onDeviceReady, false);
+        
+        // For testing in browser
+        if (window.location.protocol === 'file:' || window.location.hostname === 'localhost') {
+            onDeviceReady();
+        }
+
+        function onDeviceReady() {
+            new ExpenseTracker();
+        }
+
+        class ExpenseTracker {
+            constructor() {
+                this.expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+                this.recognition = null;
+                this.isListening = false;
+                
+                this.initializeElements();
+                this.setupEventListeners();
+                this.setupSpeechRecognition();
+                this.renderExpenses();
+                this.updateStats();
+            }
+
+            initializeElements() {
+                this.voiceBtn = document.getElementById('voiceBtn');
+                this.voiceFeedback = document.getElementById('voiceFeedback');
+                this.descriptionInput = document.getElementById('description');
+                this.amountInput = document.getElementById('amount');
+                this.categorySelect = document.getElementById('category');
+                this.addBtn = document.getElementById('addBtn');
+                this.expensesList = document.getElementById('expensesList');
+                this.totalBalance = document.getElementById('totalBalance');
+                this.expenseCount = document.getElementById('expenseCount');
+                this.avgExpense = document.getElementById('avgExpense');
+            }
+
+            setupEventListeners() {
+                this.voiceBtn.addEventListener('click', () => this.toggleVoiceRecognition());
+                this.addBtn.addEventListener('click', () => this.addExpense());
+                
+                // Allow Enter key to add expense
+                [this.descriptionInput, this.amountInput].forEach(input => {
+                    input.addEventListener('keypress', (e) => {
+                        if (e.key === 'Enter') this.addExpense();
+                    });
+                });
+            }
+
+            setupSpeechRecognition() {
+                // Check if we're in a mobile app or browser
+                const isApp = window.cordova || window.phonegap;
+                
+                if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                    this.recognition = new SpeechRecognition();
+                    this.recognition.continuous = false;
+                    this.recognition.interimResults = false;
+                    this.recognition.lang = 'en-US';
+                    
+                    // Mobile-specific settings
+                    if (isApp) {
+                        this.recognition.maxAlternatives = 1;
+                        this.voiceFeedback.textContent = 'Tap microphone to speak (Mobile app mode)';
+                    }
+
+                    this.recognition.onstart = () => {
+                        this.isListening = true;
+                        this.voiceBtn.classList.add('listening');
+                        this.voiceFeedback.textContent = 'Listening... Speak now!';
+                    };
+
+                    this.recognition.onresult = (event) => {
+                        const transcript = event.results[0][0].transcript.toLowerCase();
+                        this.voiceFeedback.textContent = `Heard: "${transcript}"`;
+                        this.parseVoiceInput(transcript);
+                    };
+
+                    this.recognition.onerror = (event) => {
+                        this.voiceFeedback.textContent = 'Sorry, could not understand. Try again.';
+                        this.stopListening();
+                    };
+
+                    this.recognition.onend = () => {
+                        this.stopListening();
+                    };
+                } else {
+                    // Fallback for unsupported devices
+                    this.voiceBtn.style.background = '#999';
+                    this.voiceFeedback.textContent = 'Voice not supported on this device - use manual input';
+                    this.voiceBtn.onclick = () => {
+                        alert('Voice recognition not supported on this device. Please use the manual input fields below.');
+                    };
+                }
+            }
+
+            toggleVoiceRecognition() {
+                // Simple permission request for web
+                if (this.isListening) {
+                    this.recognition.stop();
+                } else {
+                    // Try to start recognition and handle permission automatically
+                    try {
+                        this.recognition.start();
+                    } catch (error) {
+                        // If permission denied, show helpful message
+                        alert('To use voice input:\n1. Allow microphone access when prompted\n2. Make sure you have internet connection\n3. Speak clearly after tapping the microphone');
+                        this.voiceFeedback.textContent = 'Tap microphone and allow access when prompted';
+                    }
+                }
+            }
+
+            stopListening() {
+                this.isListening = false;
+                this.voiceBtn.classList.remove('listening');
+                setTimeout(() => {
+                    if (this.voiceFeedback.textContent.includes('Listening') || this.voiceFeedback.textContent.includes('Heard:')) {
+                        this.voiceFeedback.textContent = 'Tap the microphone to add expense by voice';
+                    }
+                }, 3000);
+            }
+
+            parseVoiceInput(transcript) {
+                // Extract amount (look for numbers)
+                const amountMatch = transcript.match(/(\d+(?:\.\d{1,2})?)/);
+                const amount = amountMatch ? parseFloat(amountMatch[1]) : null;
+
+                // Extract category based on keywords
+                const categoryKeywords = {
+                    food: ['food', 'lunch', 'dinner', 'breakfast', 'restaurant', 'cafe', 'pizza', 'burger'],
+                    transport: ['transport', 'taxi', 'bus', 'train', 'uber', 'fuel', 'petrol', 'gas'],
+                    shopping: ['shopping', 'clothes', 'shirt', 'shoes', 'mall', 'store'],
+                    entertainment: ['movie', 'cinema', 'game', 'entertainment', 'concert', 'show'],
+                    bills: ['bill', 'electricity', 'water', 'internet', 'phone', 'utility'],
+                    health: ['medicine', 'doctor', 'hospital', 'pharmacy', 'health', 'medical']
+                };
+
+                let detectedCategory = 'other';
+                for (const [category, keywords] of Object.entries(categoryKeywords)) {
+                    if (keywords.some(keyword => transcript.includes(keyword))) {
+                        detectedCategory = category;
+                        break;
+                    }
+                }
+
+                // Extract description (remove amount from transcript)
+                let description = transcript;
+                if (amountMatch) {
+                    description = transcript.replace(amountMatch[0], '').trim();
+                }
+                
+                // Clean up common phrases
+                description = description
+                    .replace(/^(i spent|spent|paid|bought|purchase|for)/i, '')
+                    .replace(/(rupees|dollars|bucks|on)$/i, '')
+                    .trim();
+
+                // Populate fields
+                if (description) this.descriptionInput.value = description;
+                if (amount) this.amountInput.value = amount;
+                this.categorySelect.value = detectedCategory;
+
+                // Auto-add if we have both description and amount
+                if (description && amount) {
+                    setTimeout(() => this.addExpense(), 1000);
+                }
+            }
+
+            addExpense() {
+                const description = this.descriptionInput.value.trim();
+                const amount = parseFloat(this.amountInput.value);
+                const category = this.categorySelect.value;
+
+                if (!description || !amount || amount <= 0) {
+                    alert('Please enter a valid description and amount');
+                    return;
+                }
+
+                const expense = {
+                    id: Date.now(),
+                    description,
+                    amount,
+                    category,
+                    date: new Date().toLocaleDateString()
+                };
+
+                this.expenses.unshift(expense);
+                this.saveExpenses();
+                this.renderExpenses();
+                this.updateStats();
+                this.clearInputs();
+
+                // Show success feedback for voice input
+                if (this.voiceFeedback.textContent.includes('Heard:')) {
+                    this.voiceFeedback.textContent = '✅ Expense added successfully!';
+                }
+            }
+
+            deleteExpense(id) {
+                this.expenses = this.expenses.filter(expense => expense.id !== id);
+                this.saveExpenses();
+                this.renderExpenses();
+                this.updateStats();
+            }
+
+            clearInputs() {
+                this.descriptionInput.value = '';
+                this.amountInput.value = '';
+                this.categorySelect.value = 'food';
+            }
+
+            saveExpenses() {
+                localStorage.setItem('expenses', JSON.stringify(this.expenses));
+            }
+
+            renderExpenses() {
+                if (this.expenses.length === 0) {
+                    this.expensesList.innerHTML = `
+                        <div class="empty-state">
+                            No expenses recorded yet.<br>
+                            Start by adding your first expense!
+                        </div>
+                    `;
+                    return;
+                }
+
+                this.expensesList.innerHTML = this.expenses.map(expense => `
+                    <div class="expense-item">
+                        <div class="expense-details">
+                            <div class="expense-description">${expense.description}</div>
+                            <span class="expense-category">${this.getCategoryIcon(expense.category)} ${expense.category}</span>
+                            <span style="margin-left: 10px; font-size: 12px; color: #999;">${expense.date}</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div class="expense-amount">₹${expense.amount.toFixed(2)}</div>
+                            <button class="delete-btn" onclick="app.deleteExpense(${expense.id})" title="Delete">🗑️</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            getCategoryIcon(category) {
+                const icons = {
+                    food: '🍔',
+                    transport: '🚗',
+                    shopping: '🛍️',
+                    entertainment: '🎬',
+                    bills: '💡',
+                    health: '🏥',
+                    other: '📋'
+                };
+                return icons[category] || '📋';
+            }
+
+            updateStats() {
+                const total = this.expenses.reduce((sum, expense) => sum + expense.amount, 0);
+                const count = this.expenses.length;
+                const average = count > 0 ? total / count : 0;
+
+                this.totalBalance.textContent = `₹${total.toFixed(2)}`;
+                this.expenseCount.textContent = count;
+                this.avgExpense.textContent = `₹${average.toFixed(0)}`;
+            }
+        }
+
+        // Make app globally accessible for delete functionality
+        let app;
+        document.addEventListener('DOMContentLoaded', () => {
+            app = new ExpenseTracker();
+        });
+    </script>
+</body>
+</html>
