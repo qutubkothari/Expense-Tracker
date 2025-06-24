@@ -399,6 +399,16 @@
                             <option value="entertainment">🎬 Entertainment</option>
                             <option value="bills">💡 Bills</option>
                             <option value="health">🏥 Health</option>
+                             <option value="education">📚 Education</option>
+    <option value="travel">✈️ Travel</option>
+    <option value="gym">💪 Gym/Fitness</option>
+    <option value="pets">🐕 Pets</option>
+    <option value="gifts">🎁 Gifts</option>
+    <option value="subscription">📱 Subscriptions</option>
+      <option value="grocery">🛒 Grocery</option>
+    <option value="internet">🌐 Internet</option>
+    <option value="petrol">⛽ Petrol</option>
+    <option value="mobile">📱 Mobile</option>
                             <option value="other">📋 Other</option>
                         </select>
                     </div>
@@ -542,7 +552,12 @@
                     shopping: ['shopping', 'clothes', 'shirt', 'shoes', 'mall', 'store'],
                     entertainment: ['movie', 'cinema', 'game', 'entertainment', 'concert', 'show'],
                     bills: ['bill', 'electricity', 'water', 'internet', 'phone', 'utility'],
-                    health: ['medicine', 'doctor', 'hospital', 'pharmacy', 'health', 'medical']
+                    health: ['medicine', 'doctor', 'hospital', 'pharmacy', 'health', 'medical'],
+                grocery: ['grocery', 'groceries', 'vegetables', 'fruits', 'milk', 'bread', 'rice', 'dal', 'supermarket', 'market', 'sabzi'],
+    internet: ['internet', 'wifi', 'broadband', 'data', 'recharge', 'jio', 'airtel', 'bsnl', 'network'],
+    petrol: ['petrol', 'diesel', 'fuel', 'gas', 'pump', 'tank', 'filling'],
+    mobile: ['mobile', 'phone', 'smartphone', 'recharge', 'prepaid', 'postpaid', 'sim', 'cell']
+
                 };
 
                 let detectedCategory = 'other';
@@ -666,6 +681,16 @@
                     entertainment: '🎬',
                     bills: '💡',
                     health: '🏥',
+                    grocery: '🛒',
+        internet: '🌐',
+        petrol: '⛽',
+        mobile: '📱',
+        education: '📚',
+        travel: '✈️',
+        gym: '💪',
+        pets: '🐕',
+        gifts: '🎁',
+        subscription: '📱',
                     other: '📋'
                 };
                 return icons[category] || '📋';
