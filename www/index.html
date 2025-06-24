@@ -374,7 +374,7 @@
                         🎤
                     </button>
                     <div class="voice-feedback" id="voiceFeedback">
-                        Tap the microphone to add expenses with your voice
+                        Tap the microphone to add expense by voice
                     </div>
                 </div>
             </div>
@@ -388,7 +388,7 @@
                 <div class="input-row">
                     <div class="input-group">
                         <label class="input-label">Amount</label>
-                        <input type="number" id="amount" placeholder="0.00" step="0.01">
+                        <input type="number" id="amount" placeholder="Amount (₹)" step="0.01">
                     </div>
                     <div class="input-group">
                         <label class="input-label">Category</label>
@@ -462,6 +462,7 @@
                 this.voiceBtn.addEventListener('click', () => this.toggleVoiceRecognition());
                 this.addBtn.addEventListener('click', () => this.addExpense());
                 
+                // Allow Enter key to add expense
                 [this.descriptionInput, this.amountInput].forEach(input => {
                     input.addEventListener('keypress', (e) => {
                         if (e.key === 'Enter') this.addExpense();
@@ -490,7 +491,7 @@
                     };
 
                     this.recognition.onerror = (event) => {
-                        this.voiceFeedback.textContent = 'Could not understand. Please try again.';
+                        this.voiceFeedback.textContent = 'Sorry, could not understand. Try again.';
                         this.stopListening();
                     };
 
@@ -498,10 +499,10 @@
                         this.stopListening();
                     };
                 } else {
-                    this.voiceBtn.style.opacity = '0.5';
-                    this.voiceFeedback.textContent = 'Voice recognition not supported on this device';
+                    this.voiceBtn.style.background = '#999';
+                    this.voiceFeedback.textContent = 'Voice not supported on this device - use manual input';
                     this.voiceBtn.onclick = () => {
-                        alert('Voice recognition not supported. Please use manual input.');
+                        alert('Voice recognition not supported on this device. Please use the manual input fields below.');
                     };
                 }
             }
@@ -513,8 +514,8 @@
                     try {
                         this.recognition.start();
                     } catch (error) {
-                        alert('Please allow microphone access and try again.');
-                        this.voiceFeedback.textContent = 'Microphone access required';
+                        alert('To use voice input:\n1. Allow microphone access when prompted\n2. Make sure you have internet connection\n3. Speak clearly after tapping the microphone');
+                        this.voiceFeedback.textContent = 'Tap microphone and allow access when prompted';
                     }
                 }
             }
@@ -524,22 +525,24 @@
                 this.voiceBtn.classList.remove('listening');
                 setTimeout(() => {
                     if (this.voiceFeedback.textContent.includes('Listening') || this.voiceFeedback.textContent.includes('Heard:')) {
-                        this.voiceFeedback.textContent = 'Tap the microphone to add expenses with your voice';
+                        this.voiceFeedback.textContent = 'Tap the microphone to add expense by voice';
                     }
                 }, 3000);
             }
 
             parseVoiceInput(transcript) {
+                // Extract amount (look for numbers)
                 const amountMatch = transcript.match(/(\d+(?:\.\d{1,2})?)/);
                 const amount = amountMatch ? parseFloat(amountMatch[1]) : null;
 
+                // Extract category based on keywords
                 const categoryKeywords = {
-                    food: ['food', 'lunch', 'dinner', 'breakfast', 'restaurant', 'cafe', 'pizza', 'burger', 'meal'],
-                    transport: ['transport', 'taxi', 'bus', 'train', 'uber', 'fuel', 'petrol', 'gas', 'metro'],
-                    shopping: ['shopping', 'clothes', 'shirt', 'shoes', 'mall', 'store', 'buy', 'purchase'],
-                    entertainment: ['movie', 'cinema', 'game', 'entertainment', 'concert', 'show', 'fun'],
-                    bills: ['bill', 'electricity', 'water', 'internet', 'phone', 'utility', 'rent'],
-                    health: ['medicine', 'doctor', 'hospital', 'pharmacy', 'health', 'medical', 'treatment']
+                    food: ['food', 'lunch', 'dinner', 'breakfast', 'restaurant', 'cafe', 'pizza', 'burger'],
+                    transport: ['transport', 'taxi', 'bus', 'train', 'uber', 'fuel', 'petrol', 'gas'],
+                    shopping: ['shopping', 'clothes', 'shirt', 'shoes', 'mall', 'store'],
+                    entertainment: ['movie', 'cinema', 'game', 'entertainment', 'concert', 'show'],
+                    bills: ['bill', 'electricity', 'water', 'internet', 'phone', 'utility'],
+                    health: ['medicine', 'doctor', 'hospital', 'pharmacy', 'health', 'medical']
                 };
 
                 let detectedCategory = 'other';
@@ -550,20 +553,24 @@
                     }
                 }
 
+                // Extract description (remove amount from transcript)
                 let description = transcript;
                 if (amountMatch) {
                     description = transcript.replace(amountMatch[0], '').trim();
                 }
                 
+                // Clean up common phrases
                 description = description
                     .replace(/^(i spent|spent|paid|bought|purchase|for)/i, '')
                     .replace(/(rupees|dollars|bucks|on)$/i, '')
                     .trim();
 
+                // Populate fields
                 if (description) this.descriptionInput.value = description;
                 if (amount) this.amountInput.value = amount;
                 this.categorySelect.value = detectedCategory;
 
+                // Auto-add if we have both description and amount
                 if (description && amount) {
                     setTimeout(() => this.addExpense(), 1000);
                 }
@@ -593,6 +600,7 @@
                 this.updateStats();
                 this.clearInputs();
 
+                // Show success feedback for voice input
                 if (this.voiceFeedback.textContent.includes('Heard:')) {
                     this.voiceFeedback.textContent = '✅ Expense added successfully!';
                 }
@@ -674,6 +682,7 @@
             }
         }
 
+        // Initialize the app
         let app;
         document.addEventListener('DOMContentLoaded', () => {
             app = new ExpenseTracker();
